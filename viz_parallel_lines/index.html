@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>NBA Descriptions Topics</title>
+<style>
+
+button,
+.button {
+ -moz-appearance: none;
+ -webkit-appearance: none;
+ -ms-appearance: none;
+ appearance: none;
+ -moz-transition: background-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+ -webkit-transition: background-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+ -ms-transition: background-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+ transition: background-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+ background-color: transparent;
+ border: 0;
+ box-shadow: inset 0 0 0 1px rgba(160, 160, 160, 0.3);
+ color: #3c3b3b !important;
+ cursor: pointer;
+ display: inline-block;
+ font-family: "Raleway", Helvetica, sans-serif;
+ font-size: 0.6em;
+ font-weight: 800;
+ height: 4.8125em;
+ letter-spacing: 0.25em;
+ line-height: 4.8125em;
+ padding: 0 2.5em;
+ text-align: center;
+ text-decoration: none;
+ text-transform: uppercase;
+ white-space: nowrap;
+}
+
+.date {
+  font-size: small;
+  font-style: italic;
+  margin: 0;
+  width: 100%;
+  border-top: solid #eee 1px;
+}
+
+.breadcrumbs {
+  font-size: small;
+  font-family: sans-serif;
+  width: 100%;
+  margin: 0;
+  padding-top: 3px;
+  font-style: italic;
+  border-bottom: solid #eee 1px;
+  color: #999;
+}
+
+a {
+  color: steelblue;
+}
+
+a:not(:hover) {
+  text-decoration: none;
+}
+
+body {
+  margin: 0 auto;
+  font-family: Verdana,Arial,sans-serif;
+  line-height: 1.5em;
+  color: #333;
+  background: #fefefe;
+  width: 960px;
+  position: relative;
+}
+
+p {
+  width: 720px;
+}
+
+h1, h2, h3 {
+  font-weight: 300;
+  text-rendering: optimizeLegibility;
+}
+
+h1 {
+  font-size: 2.5em;
+}
+
+aside {
+  font-size: small;
+  position: absolute;
+  right: 0;
+  width: 180px;
+}
+
+aside p {
+  width: auto;
+}
+
+p.cite, p.caption {
+  color: #666;
+}
+
+p.caption {
+  text-align: center;
+  font-size: small;
+  font-style: italic;
+  width: auto;
+}
+
+rect {
+  stroke: #000;
+  fill: none;
+}
+
+svg {
+  shape-rendering: crispEdges;
+}
+
+.axis path, .axis line {
+  fill: none;
+  stroke: #000;
+}
+
+.label {
+  color: #800;
+}
+
+
+#legend {
+    padding: 1.5em 0 0 1.5em;
+}
+
+li.key {
+    border-top-width: 15px;
+    border-top-style: solid;
+    font-size: .75em;
+    width: 10%;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+</style>
+<h1>NBA Topic Modeling</h1>
+<script src="//d3js.org/d3.v3.min.js"></script>
+<script src="colorbrewer.js"></script>
+<script>
+
+
+var margin = {top: 10, right: 20, bottom: 30, left: 60},
+    width = 960 - margin.left - margin.right,
+    height = 600 - margin.top - margin.bottom,
+    color = d3.scale.ordinal()
+    .domain([1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5])
+    .range(colorbrewer.Blues[9]);
+    labelcolor = d3.scale.ordinal()
+    .domain([5, 4.5, 4, 3.5, 3, 2.5, 2, 1.5, 1])
+    .range(colorbrewer.Greys[9]);
+
+    n = d3.format(",.0f"),
+    p = d3.format("%"),
+
+    keys = ['Topic', 'Position', 'Value']
+    pos = [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5]
+    pos_name = ["PG", "PG/SG", "SG", "SG/SF", "SF", "SF/PF", "PF", "PF/C", "C"]
+    data = [{'position': 1.0, 'topic': 0, 'value': 26},
+           {'position': 1.5, 'topic': 0, 'value': 6},
+           {'position': 2.0, 'topic': 0, 'value': 41},
+           {'position': 2.5, 'topic': 0, 'value': 13},
+           {'position': 3.0, 'topic': 0, 'value': 76},
+           {'position': 3.5, 'topic': 0, 'value': 31},
+           {'position': 4.0, 'topic': 0, 'value': 77},
+           {'position': 4.5, 'topic': 0, 'value': 26},
+           {'position': 5.0, 'topic': 0, 'value': 55},
+           {'position': 1.0, 'topic': 1, 'value': 67},
+           {'position': 1.5, 'topic': 1, 'value': 39},
+           {'position': 2.0, 'topic': 1, 'value': 47},
+           {'position': 2.5, 'topic': 1, 'value': 25},
+           {'position': 3.0, 'topic': 1, 'value': 23},
+           {'position': 3.5, 'topic': 1, 'value': 5},
+           {'position': 4.0, 'topic': 1, 'value': 7},
+           {'position': 4.5, 'topic': 1, 'value': 0},
+           {'position': 5.0, 'topic': 1, 'value': 3},
+           {'position': 1.0, 'topic': 2, 'value': 6},
+           {'position': 1.5, 'topic': 2, 'value': 4},
+           {'position': 2.0, 'topic': 2, 'value': 8},
+           {'position': 2.5, 'topic': 2, 'value': 4},
+           {'position': 3.0, 'topic': 2, 'value': 18},
+           {'position': 3.5, 'topic': 2, 'value': 11},
+           {'position': 4.0, 'topic': 2, 'value': 50},
+           {'position': 4.5, 'topic': 2, 'value': 29},
+           {'position': 5.0, 'topic': 2, 'value': 64}];
+
+ //   year = [ 2000.,  2001.,  2002.,  2003.,  2004.,  2005.,  2006.,  2007.,
+ //       2008.,  2009.,  2010.,  2011.,  2012.,  2013.,  2014.,  2015.]
+ //    data = [{'position': 2000.0, 'topic': 0, 'value': 19},
+ // {'position': 2001.0, 'topic': 0, 'value': 21},
+ // {'position': 2002.0, 'topic': 0, 'value': 23},
+ // {'position': 2003.0, 'topic': 0, 'value': 24},
+ // {'position': 2004.0, 'topic': 0, 'value': 23},
+ // {'position': 2005.0, 'topic': 0, 'value': 17},
+ // {'position': 2006.0, 'topic': 0, 'value': 6},
+ // {'position': 2007.0, 'topic': 0, 'value': 6},
+ // {'position': 2008.0, 'topic': 0, 'value': 10},
+ // {'position': 2009.0, 'topic': 0, 'value': 20},
+ // {'position': 2010.0, 'topic': 0, 'value': 36},
+ // {'position': 2011.0, 'topic': 0, 'value': 31},
+ // {'position': 2012.0, 'topic': 0, 'value': 35},
+ // {'position': 2013.0, 'topic': 0, 'value': 25},
+ // {'position': 2014.0, 'topic': 0, 'value': 41},
+ // {'position': 2015.0, 'topic': 0, 'value': 14},
+ // {'position': 2000.0, 'topic': 1, 'value': 4},
+ // {'position': 2001.0, 'topic': 1, 'value': 3},
+ // {'position': 2002.0, 'topic': 1, 'value': 1},
+ // {'position': 2003.0, 'topic': 1, 'value': 3},
+ // {'position': 2004.0, 'topic': 1, 'value': 7},
+ // {'position': 2005.0, 'topic': 1, 'value': 18},
+ // {'position': 2006.0, 'topic': 1, 'value': 23},
+ // {'position': 2007.0, 'topic': 1, 'value': 28},
+ // {'position': 2008.0, 'topic': 1, 'value': 22},
+ // {'position': 2009.0, 'topic': 1, 'value': 26},
+ // {'position': 2010.0, 'topic': 1, 'value': 12},
+ // {'position': 2011.0, 'topic': 1, 'value': 14},
+ // {'position': 2012.0, 'topic': 1, 'value': 13},
+ // {'position': 2013.0, 'topic': 1, 'value': 19},
+ // {'position': 2014.0, 'topic': 1, 'value': 10},
+ // {'position': 2015.0, 'topic': 1, 'value': 13},
+ // {'position': 2000.0, 'topic': 2, 'value': 5},
+ // {'position': 2001.0, 'topic': 2, 'value': 7},
+ // {'position': 2002.0, 'topic': 2, 'value': 7},
+ // {'position': 2003.0, 'topic': 2, 'value': 5},
+ // {'position': 2004.0, 'topic': 2, 'value': 3},
+ // {'position': 2005.0, 'topic': 2, 'value': 20},
+ // {'position': 2006.0, 'topic': 2, 'value': 22},
+ // {'position': 2007.0, 'topic': 2, 'value': 24},
+ // {'position': 2008.0, 'topic': 2, 'value': 26},
+ // {'position': 2009.0, 'topic': 2, 'value': 10},
+ // {'position': 2010.0, 'topic': 2, 'value': 9},
+ // {'position': 2011.0, 'topic': 2, 'value': 8},
+ // {'position': 2012.0, 'topic': 2, 'value': 7},
+ // {'position': 2013.0, 'topic': 2, 'value': 9},
+ // {'position': 2014.0, 'topic': 2, 'value': 4},
+ // {'position': 2015.0, 'topic': 2, 'value': 28}]
+
+var nest = d3.nest()
+    .key(function(d) { return d.topic; })
+    .key(function(d) { return d.position; });
+
+var treemap = d3.layout.treemap()
+    .mode("slice-dice")
+    .padding(function(d) { return d.depth > 1 ? 2 : 0; })
+    .size([width, height])
+    .children(function(d) { return d.values; })
+    .sort(function comparator(a, b) {
+    return b.key - a.key;
+  });
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width + width/5 + margin.left + margin.right)
+    .attr("height", height + 60 + margin.top + margin.bottom)
+    .style("margin-left", -margin.left + "px")
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+    .datum({values: nest.entries(data)})
+    .call(chart);
+
+svg.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + treemap.size()[1] + ")")
+    .call(d3.svg.axis().scale(d3.scale.linear().range([0, treemap.size()[0]])).tickFormat(d3.format("%")));
+
+
+svg.append("g")
+    .attr("class", "y axis")
+    .call(d3.svg.axis().scale(d3.scale.linear().range([treemap.size()[1], 0])).tickFormat(d3.format("%")).orient("left"));
+
+svg.append("text")
+    .attr("class","x label")
+    .attr("text-anchor","middle")
+    .attr("x",width/2)
+    .attr("y",height+40)
+    .text("Topics");
+
+svg.append("text")
+    .attr("class","y label")
+    .attr("text-anchor","middle")
+    .attr("transform", "translate("+"-45"+","+height/2+")rotate(-90)")
+    .text(function(d) {return "Position"});
+
+function chart(selection) {
+  selection.each(function() {
+    var cell = d3.select(this).selectAll("g.cell")
+        .data(treemap.nodes);
+
+    var cellEnter = cell.enter().append("g")
+        .attr("class", "cell")
+        .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+
+    cellEnter.filter(function(d) { return d.depth > 2; }).append("rect")
+        .style("fill", function(d) { return d.children ? null : color(d.position); });
+
+    // cellEnter.filter(function(d) { return d.depth > 2; }).append("text")
+    //   .attr("x", function(d) {return d.dx/2 - 4;})
+    //   .attr("y", function(d) {return d.dy/2 + 4;})
+    //   .attr("text-anchor", "middle")
+    //   .style("fill", function(d) { return d.children ? null : labelcolor(d.position); })
+    //   .text(function(d) {return d.value < 5 ? null : d.position});
+
+    cellEnter.append("title");
+
+    d3.transition(cell)
+        .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+      .select("rect")
+        .attr("width", function(d) { return d.dx; })
+        .attr("height", function(d) { return d.dy; })
+
+    cell.select("title")
+        .text(function(d) { return d.children ? null : title(d); });
+
+    d3.transition(cell.exit())
+        .attr("width", 1e-6)
+        .attr("height", 1e-6)
+        .remove();
+  });
+}
+
+function title(d) {
+  return "Topic:"+ d.topic + ": " + d.parent.key + ": " + n(d.value);
+}
+
+function transition() {
+  data.forEach(function(d) { d.value = Math.random() * 1000; });
+  svg.datum({values: nest.entries(data)})
+      .transition()
+      .duration(1000)
+      .call(chart);
+}
+
+</script>
+<p><button class="first last" onclick="transition()">Randomise!</button><p>
